@@ -42,7 +42,7 @@ module TinyMapReduce
         t.drain = 'TinyMapReduce::Sample::PNCount'
         t.worker_uris = uris
 
-        t.def_map %q!
+        t.map = %q!
 lambda{|n|
 p n
   b = true
@@ -59,7 +59,7 @@ p n
 }
         !
 
-        t.def_combiner %q!
+        t.combiner = %q!
 lambda{|arr|
   combined = {}
   arr.each{|hash|
@@ -75,7 +75,7 @@ lambda{|arr|
 }
         !
 
-        t.def_reduce %q!
+        t.reduce = %q!
 lambda{|key,values|
   values.inject(0){|sum, count| sum + count}
 }

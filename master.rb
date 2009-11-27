@@ -4,19 +4,7 @@ require 'digest/md5'
 
 module TinyMapReduce
   class Master
-    attr_accessor :source, :drain, :worker_uris, :tid, :m
-
-    def def_map f
-      @map_f = f
-    end
-
-    def def_combiner f
-      @combiner_f = f
-    end
-
-    def def_reduce f
-      @reduce_f = f
-    end
+    attr_accessor :map, :combiner, :reduce, :source, :drain, :worker_uris, :tid, :m
 
     def execute
       @m ||= @worker_uris.size
@@ -35,7 +23,7 @@ module TinyMapReduce
           while i = map_queue.shift
             map_try_log[i] = map_try_log[i] ? map_try_log[i] + 1 : 1
             puts "  assigned source chunk #{i} to #{w.inspect}"
-            res = w.run_map(@tid, @worker_uris, @source, m, i, @map_f, @combiner_f)
+            res = w.run_map(@tid, @worker_uris, @source, m, i, @map, @combiner)
             if res == 1
               puts "  !!! Map process failed during Source Chunk #{i} on #{w.inspect} !!!"
             else
@@ -50,7 +38,7 @@ module TinyMapReduce
 
       ts = workers.map{|w|
         Thread.new do
-          res = w.run_reduce(@tid, @drain, @reduce_f)
+          res = w.run_reduce(@tid, @drain, @reduce)
           if res == 1
             puts "  !!! Reduce process failed on #{w.inspect} !!!"
           else 

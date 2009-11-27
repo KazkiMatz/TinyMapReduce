@@ -40,7 +40,7 @@ module TinyMapReduce
       nil
 
     rescue => error
-      puts "(map) #{error.class.to_s} : #{error.message}"
+      puts "tid-#{tid}:Error(map) #{error.class.to_s} : #{error.message}"
       1
     end
 
@@ -51,9 +51,9 @@ module TinyMapReduce
       puts "#{@im[tid].size} keys to reduce" if @im[tid]
 
       (@im[tid] || {}).each do |key, values|
-        puts "key:#{key} - reducing"
+        puts "tid-#{tid}:key:#{key} - reducing"
         drain.store(tid, key, reduce.call(key, values))
-        puts "key:#{key} - finished"
+        puts "tid-#{tid}:key:#{key} - finished"
       end
 
       @im.delete tid
@@ -61,7 +61,7 @@ module TinyMapReduce
       nil
 
     rescue => error
-      puts "(reduce) #{error.class.to_s} : #{error.message}"
+      puts "tid-#{tid}:Error(reduce) #{error.class.to_s} : #{error.message}"
       1
     end
 
@@ -76,7 +76,7 @@ module TinyMapReduce
       res
 
     rescue => error
-      puts "(combine) #{error.class.to_s} : #{error.message}"
+      puts "tid-#{tid}:Error(combine) #{error.class.to_s} : #{error.message}"
       1
     end
 
@@ -86,7 +86,7 @@ module TinyMapReduce
         @im[tid][key] ||= []
         @im[tid][key] += values
       end
-      puts "stored #{im.size} keys to IM"
+      puts "tid-#{tid}:stored #{im.size} keys to IM"
 
       nil
     end
