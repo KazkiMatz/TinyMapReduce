@@ -82,7 +82,6 @@ lambda{|key,values|
         !
 
         t.m = 10000
-        t.r = 1
 
         t.execute
 
