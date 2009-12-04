@@ -26,11 +26,11 @@ module TinyMapReduce
       end
     end
 
-    class PNCount < SimpleResource::Base
+    class MCount < SimpleResource::Base
       include SimpleResource::TtEntityBackend
       class << self
         def store tid, key, value
-          create('id' => tid, 'value' => value)
+          create('id' => "#{tid}/#{key}", 'value' => value)
         end
       end
     end
@@ -38,24 +38,16 @@ module TinyMapReduce
     class << self
       def run_sample uris
         t = TinyMapReduce::Master.new
-        t.source = 'TinyMapReduce::Sample::Integers.upto(100000)'
-        t.drain = 'TinyMapReduce::Sample::PNCount'
+        t.source = 'TinyMapReduce::Sample::Integers.upto(1000000)'
+        t.drain = 'TinyMapReduce::Sample::MCount'
         t.worker_uris = uris
 
         t.map = %q!
 lambda{|n|
-p n
-  b = true
-  if n > 2
-    (2..((n.to_f/2.0).floor)).each{|d|
-      next if n % d > 0
-      b = false
-      break
-    }
-  elsif n == 1
-    b = false
-  end
-  {"pn_count" => (b ? 1 : 0)}
+  res = {}
+  res['m_of_2'] = 1 if n%2 == 0
+  res['m_of_3'] = 1 if n%3 == 0
+  res
 }
         !
 
@@ -81,11 +73,12 @@ lambda{|key,values|
 }
         !
 
-        t.m = 10000
+        t.m = 100
 
         t.execute
 
-        puts "result: #{PNCount.find(t.tid).value}"
+        puts "result - m_of_2: #{MCount.find("#{t.tid}/m_of_2").value}"
+        puts "result - m_of_3: #{MCount.find("#{t.tid}/m_of_3").value}"
       end
     end
   end
