@@ -3,9 +3,32 @@
 Installation
 ============
 
-0. Dependencies:
-    * foo
+0. Place all files into lib/tiny_map_reduce on your Rails project.
 
+Run the Sample Task
+===================
+
+A sample task code is attached that count the number of multiples of two and three from natural numbers up to 1,000,000.
+Note that the sample code is designed to use SimpleResource(http://github.com/kazuki-m/SimpleResource) & TokyoTyrant to store the final output.
+
+(1) Stand Workers
+
+[foo@node1]$ script/console
+> TinyMapReduce::Launcher.start 'druby://node0.foo.local:11111'
+
+[foo@node2]$ script/console
+> TinyMapReduce::Launcher.start 'druby://node1.foo.local:11111'
+
+[foo@node3]$ script/console
+> TinyMapReduce::Launcher.start 'druby://node2.foo.local:11111'
+
+...
+
+
+(2) Launch Master
+
+[foo@node0]$ script/console
+> TinyMapReduce::Sample.run_sample ['druby://node0.foo.local:11111', 'druby://node1.foo.local:11111', 'druby://node2.foo.local:11111', ... ]
 
 
 Note
